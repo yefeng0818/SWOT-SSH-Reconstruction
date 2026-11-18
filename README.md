@@ -71,9 +71,7 @@ The two cases compare Global Drifter Program (GDP) observations (black) with vir
 ![Observed and virtual drifter tracks during eddy trapping and exit, 28 October–15 December 2023](assets/ms02.gif)
 
 ## Usage
-
-Install Git LFS before cloning to download the pretrained checkpoint. In an existing clone, run `git lfs pull` after installing Git LFS to fetch `weights/best.pt`.
-
+Download the complete package (including pretrained weights) from Releases and extract it.
 ```bash
 pip install -r requirements.txt
 pip install -e .
