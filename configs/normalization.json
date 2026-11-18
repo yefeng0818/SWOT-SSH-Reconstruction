@@ -1,0 +1,9 @@
+{
+  "sla_std_m": 0.49355140553647886,
+  "innovation_scale_m": 0.032690804451704025,
+  "residual_scale_m": 0.03366173803806305,
+  "err_mean_m": 0.02031751535832882,
+  "real_innovation_std_m": 0.036286789923906326,
+  "real_err_mean_m": 0.02110341377556324,
+  "source": "LLC train split (scales) and real attrs (sla_std); fixed for all stages"
+}

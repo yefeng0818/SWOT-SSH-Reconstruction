@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "swot-cfm"
+version = "1.0.0"
+description = "Conditional flow matching for daily SWOT-scale sea surface height reconstruction"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.24",
+    "scipy>=1.10",
+    "torch>=2.1",
+    "h5py>=3.9",
+    "PyYAML>=6.0",
+    "netCDF4>=1.6",
+    "pandas>=2.0",
+    "accelerate>=0.27",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

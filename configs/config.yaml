@@ -1,0 +1,173 @@
+project:
+  name: swot_cfm
+  seed: 20261016
+
+paths:
+  work_dir: outputs
+  cache_dir: data
+  cache_files:
+    llc_cache.h5: data/llc4320_osse_sample.h5
+    real_1day_cache.h5: data/duacs_swot_sample.h5
+    real_cache.h5: data/duacs_swot_sample.h5
+    normalization.json: configs/normalization.json
+    simulator_calibration.json: configs/simulator_calibration.json
+
+balanced:
+  dac_cutoff_days: 20.0
+  surface_order: 2
+  boxcar_hours: 25
+
+emulator:
+  type: nadir_oi
+  nadir:
+    length_km: 150.0
+    time_days: 4.0
+    filter_km: 65.0
+    decimation: 2
+    noise_scale: 1.0
+    pass_bias_m: 0.01
+    pass_tilt_m_per_1000km: 0.01
+    max_obs: 7000
+    grid_stride: 4
+    err_stride: 16
+    min_pass_points: 30
+
+observations:
+  train_realizations: [[12, 37], [13, 61], [12, 89], [13, 113]]
+  augment_flips: true
+  window_days: 3
+  bin_edges_days: [-3, -1.5, -0.5, 0.5, 1.5, 3]
+  folds: 5
+  fold_seed: 20261009
+  fold_drop_probability: 0.5
+  white_noise_m: 0.008
+  offset_sigma_m: 0.015
+  along_tilt_sigma_m_per_100km: 0.01
+  cross_tilt_sigma_m_per_100km: 0.03
+  oneday_year_offset: 11
+  oneday_sample_probability: 0.5
+
+cfm:
+  base_channels: 64
+  channel_mults: [1, 2, 4, 8]
+  blocks_per_level: 2
+  groups: 8
+  attention_heads: 4
+  time_dim: 128
+  dropout: 0.08
+  adapters: true
+  steps: 32
+  solver: heun
+
+training:
+  mixed_precision: fp16
+  gradient_accumulation_steps: 1
+  gradient_clip_norm: 1.0
+  num_workers: 0
+  pin_memory: true
+  log_every: 20
+  epochs: 600
+  batch_size: 4
+  learning_rate: 1.0e-4
+  weight_decay: 0.01
+  warmup_steps: 300
+  validate_every: 10
+  validation_days: 20
+
+loss:
+  band_km: [30, 150]
+  band_weight: 1.0
+  gradient_weight: 0.5
+  gradient_reference: 0.01
+
+baselines:
+  unet:
+    model:
+      base_channels: 32
+      channel_mults: [1, 2, 4, 4, 8, 8]
+      blocks_per_level: 2
+      groups: 8
+      attention_heads: 4
+      dropout: 0.0
+      adapters: true
+      zero_mean_residual: true
+    training:
+      epochs: 200
+      batch_size: 4
+      learning_rate: 3.0e-4
+      weight_decay: 0.01
+      warmup_steps: 100
+      validate_every: 2
+      validation_days: 40
+  fno:
+    model:
+      width: 32
+      modes: [16, 20]
+      layers: 4
+      pad: 16
+    training:
+      epochs: 200
+      batch_size: 4
+      learning_rate: 1.0e-3
+      weight_decay: 1.0e-2
+      warmup_steps: 100
+      validate_every: 2
+      validation_days: 40
+  vit:
+    model:
+      shape: [384, 480]
+      patch: 8
+      dim: 512
+      depth: 12
+      heads: 8
+      mlp: 4
+      dropout: 0.0
+      decoder_channels: 16
+    training:
+      epochs: 400
+      batch_size: 4
+      learning_rate: 3.0e-4
+      weight_decay: 0.05
+      warmup_steps: 500
+      validate_every: 2
+      validation_days: 40
+  fourdvarnet:
+    model:
+      hidden: 64
+      grad_hidden: 96
+      cond: 16
+      downsamp: 2
+      n_steps: 10
+      lr_grad: 0.2
+    prior_weight: 0.1
+    training:
+      epochs: 200
+      batch_size: 4
+      learning_rate: 1.0e-3
+      weight_decay: 1.0e-4
+      warmup_steps: 100
+      validate_every: 2
+      validation_days: 40
+  edm:
+    model:
+      sigma_data: 1.0
+    training:
+      epochs: 600
+      batch_size: 4
+      learning_rate: 1.0e-4
+      weight_decay: 0.01
+      warmup_steps: 300
+      validate_every: 10
+      validation_days: 20
+  ddpm:
+    model:
+      steps: 1000
+    training:
+      epochs: 600
+      batch_size: 2
+      gradient_accumulation_steps: 6
+      learning_rate: 1.0e-4
+      weight_decay: 0.01
+      warmup_steps: 300
+      validate_every: 10
+      validation_days: 20
